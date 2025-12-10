@@ -1,5 +1,7 @@
+# courses/serializers.py
 from rest_framework import serializers
 from .models import Course, EnrollmentRequest
+
 
 class CourseSerializer(serializers.ModelSerializer):
     enrolled_count = serializers.IntegerField(read_only=True)

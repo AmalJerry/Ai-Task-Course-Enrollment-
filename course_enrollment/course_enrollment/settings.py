@@ -62,13 +62,14 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 REST_FRAMEWORK = {
-    # No authentication classes → DRF won’t expect tokens / sessions
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
-
-    # Everything is allowed by default
+    
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 ROOT_URLCONF = 'course_enrollment.urls'
