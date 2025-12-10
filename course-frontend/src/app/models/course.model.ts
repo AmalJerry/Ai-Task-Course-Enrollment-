@@ -6,4 +6,9 @@ export interface Course {
   max_capacity: number;
   teacher: number;       // teacher ID
   enrolled_count: number;
+  teacher_detail?: {     // optional nested teacher info
+    id: number;
+    username: string;
+    email: string;
+  };
 }

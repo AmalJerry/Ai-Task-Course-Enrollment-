@@ -58,7 +58,7 @@ export class CourseListComponent implements OnInit {
 
     this.enrollmentService.create(this.studentId, course.id).subscribe({
       next: (res) => {
-        this.successMessage = `Applied to "${res.course_detail.name}" (status: ${res.status}).`;
+        this.successMessage = `Applied to "${res.course_detail?.name || course.name}" (status: ${res.status}).`;
       },
       error: (err) => {
         console.error('Error applying for course', err);

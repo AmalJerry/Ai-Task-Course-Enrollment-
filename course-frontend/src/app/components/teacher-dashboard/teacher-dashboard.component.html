@@ -1,0 +1,197 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Teacher Dashboard</h1>
+      <div class="user-info">
+        <span class="welcome">Welcome, {{ currentUser?.username }}!</span>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Messages -->
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Course Management Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2>My Courses</h2>
+        <button class="btn-primary" (click)="showCourseForm = !showCourseForm">
+          {{ showCourseForm ? 'Cancel' : '+ Create New Course' }}
+        </button>
+      </div>
+
+      <!-- Error in courses section -->
+      <div class="error-message" *ngIf="errorMessage && !successMessage" style="margin-bottom: 20px;">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Create Course Form -->
+      <div class="course-form" *ngIf="showCourseForm">
+        <h3>Create New Course</h3>
+        <form (ngSubmit)="createCourse()" #courseForm="ngForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Course Name *</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                [(ngModel)]="newCourse.name"
+                required
+                class="form-control"
+                placeholder="e.g., Introduction to Programming"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="code">Course Code *</label>
+              <input
+                type="text"
+                id="code"
+                name="code"
+                [(ngModel)]="newCourse.code"
+                required
+                class="form-control"
+                placeholder="e.g., CS101"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea
+              id="description"
+              name="description"
+              [(ngModel)]="newCourse.description"
+              required
+              class="form-control"
+              rows="3"
+              placeholder="Describe the course..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="max_capacity">Maximum Capacity *</label>
+            <input
+              type="number"
+              id="max_capacity"
+              name="max_capacity"
+              [(ngModel)]="newCourse.max_capacity"
+              required
+              min="1"
+              class="form-control"
+              placeholder="30"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="!courseForm.valid"
+          >
+            Create Course
+          </button>
+        </form>
+      </div>
+
+      <!-- Courses List -->
+      <div class="courses-grid" *ngIf="courses.length > 0 && !loading">
+        <div class="course-card" *ngFor="let course of courses">
+          <div class="course-header">
+            <h3>{{ course.name }}</h3>
+            <span class="course-code">{{ course.code }}</span>
+          </div>
+          <p class="course-description">{{ course.description }}</p>
+          <div class="course-stats">
+            <div class="stat">
+              <span class="stat-label">Enrolled:</span>
+              <span class="stat-value">{{ course.enrolled_count }} / {{ course.max_capacity }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Pending Requests:</span>
+              <span class="stat-value pending">{{ getPendingRequestsForCourse(course.id) }}</span>
+            </div>
+          </div>
+          <div class="course-actions">
+            <button class="btn-danger" (click)="deleteCourse(course.id)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="loading">
+        Loading courses...
+      </div>
+
+      <div class="empty-state" *ngIf="courses.length === 0 && !loading">
+        <p>No courses yet. Create your first course!</p>
+      </div>
+    </section>
+
+    <!-- Enrollment Requests Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Enrollment Requests</h2>
+      </div>
+
+      <!-- Debug info for enrollment requests -->
+      <div style="padding: 10px; background: #f0f0f0; margin-bottom: 15px; font-size: 12px; border-radius: 5px;">
+        <strong>Debug Info:</strong> 
+        Enrollment Requests Count: {{ enrollmentRequests.length }} | 
+        Loading: {{ loading }}
+      </div>
+
+      <div class="table-container" *ngIf="enrollmentRequests.length > 0">
+        <table class="requests-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Status</th>
+              <th>Requested At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of enrollmentRequests">
+              <td>{{ request.student_detail?.username || 'N/A' }}</td>
+              <td>{{ request.course_detail?.name || 'N/A' }}</td>
+              <td>
+                <span class="status-badge" [class]="'status-' + request.status.toLowerCase()">
+                  {{ request.status }}
+                </span>
+              </td>
+              <td>{{ request.created_at | date: 'short' }}</td>
+              <td>
+                <button
+                  *ngIf="request.status === 'PENDING'"
+                  class="btn-approve"
+                  (click)="approveEnrollment(request)"
+                >
+                  Approve
+                </button>
+                <span *ngIf="request.status !== 'PENDING'" class="text-muted">
+                  {{ request.status === 'ENROLLED' ? 'Approved' : request.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="enrollmentRequests.length === 0 && !loading">
+        <p>No enrollment requests yet.</p>
+      </div>
+    </section>
+  </main>
+</div>

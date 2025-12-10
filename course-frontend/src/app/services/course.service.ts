@@ -16,4 +16,20 @@ export class CourseService {
   getCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(this.baseUrl);
   }
+
+  getCourse(id: number): Observable<Course> {
+    return this.http.get<Course>(`${this.baseUrl}${id}/`);
+  }
+
+  createCourse(courseData: any): Observable<Course> {
+    return this.http.post<Course>(this.baseUrl, courseData);
+  }
+
+  updateCourse(id: number, courseData: any): Observable<Course> {
+    return this.http.put<Course>(`${this.baseUrl}${id}/`, courseData);
+  }
+
+  deleteCourse(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}${id}/`);
+  }
 }
